@@ -1,0 +1,2 @@
+Generador de Backdoor para windows/linux = https://www.youtube.com/watch?v=wER6dsqEVAs
+Analisis y explotacion de vulnerabilidad con nmap y netcat = https://www.youtube.com/watch?v=2TV0gYiV2fM

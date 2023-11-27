@@ -1,0 +1,197 @@
+####################################################
+# 4. Funciones
+# [https://youtu.be/5bdtBkT78-Y?si=tZg5ui3BWmVH7N7T]
+####################################################
+
+
+def dividir(x, y):     # Función y sus parametros
+    return x / y
+
+
+def sin_return(x, y):  # Por defecto se devuelve None
+    x / y
+
+
+def dividir(x: float, y: float) -> float:     # Type-Hints | RECOMENDADO
+    return x / y
+
+
+def sin_return(x: float, y: float) -> float:  # Recomendaciones con Type-Hints
+    x / y
+
+
+assert dividir(10, 8) == 1.25      # Orden idéntico a la definición
+assert dividir(8, 10) == 0.8       # El Orden es importante
+assert dividir(x=10, y=8) == 1.25  # Usando parametros explícitos
+assert dividir(y=8, x=10) == 1.25  # Orden irrelevante
+
+
+def es_mayor_de_edad(edad: int, limite: int = 18) -> bool:  # Valor por defecto
+    if edad >= limite:
+        resultado = True
+    else:
+        resultado = False
+    return resultado
+
+
+def es_mayor_de_edad(edad: int, limite: int = 18) -> bool:  # Múltiples returns
+    if edad >= limite:
+        return True
+    return False
+
+
+def es_mayor_de_edad(edad: int, limite: int = 18) -> bool:  # Return expression
+    return edad >= limite
+
+
+assert not es_mayor_de_edad(10)
+assert es_mayor_de_edad(18)
+assert es_mayor_de_edad(24)
+
+
+from typing import List, Tuple   # Biblioteca Estándar
+
+precios: List[float] = [4.04, 5.37, 7.77, 0.09, 9.11, 4.96, 9.12, 2.28, 8.09, 7.36]
+
+
+# Return con múltiples valores
+def hay_oferta(precios: List[float]) -> Tuple[bool, float]:
+    precio_mas_bajo = min(precios)
+    if precio_mas_bajo < 3:
+        return True, precio_mas_bajo
+    return False, precio_mas_bajo
+
+
+assert hay_oferta(precios) == (True, 0.09)  # => Devuelve Tupla
+existe_oferta, monto = hay_oferta(precios)  # => Desempaquetado
+assert existe_oferta
+assert monto == 0.09
+
+
+####################################################
+# 4.1 Parametros Arbitrarios
+####################################################
+
+def suma(*args: float):           # Parametros posicionales arbitrarios
+    resultado = 0
+    for valor in args:
+        resultado += valor
+    return resultado
+
+
+assert suma(1, 2, 3) == 6
+
+
+from typing import Dict   # Biblioteca Estándar
+
+def concatenate(**kwargs: str):   # Parametros de palabra clave arbitrarios
+    return " ".join(kwargs.values())
+
+
+concatenate(a="Hola", b="Mundo")  # => 'Hola Mundo '
+
+numeros: List[float] = [1, 2, 3, 4]
+palabras: Dict[str, str] = {"a": "Hola", "b": "Mundo"}
+assert suma(*numeros) == 10
+assert concatenate(**palabras) == 'Hola Mundo'
+
+
+####################################################
+# 4.2 Funciones de orden superior
+####################################################
+
+from typing import Callable   # Biblioteca Estándar
+
+# Funciones como parámetros
+
+def aplicar_funcion(lista: List[float], funcion: Callable[[float], float]) -> List[float]:
+    resultados = []
+    for elemento in lista:
+        resultado = funcion(elemento)
+        resultados.append(resultado)
+    return resultados
+
+
+def cuadrado(x: float) -> float:
+    return x ** 2
+
+
+lista: List[float] = [1, 2, 3, 4, 5, 6]
+assert aplicar_funcion(lista, cuadrado) == [1, 4, 9, 16, 25, 36]
+
+
+# Funciones dentro de funciones (Closures)
+
+def elevar(y: float) -> Callable[[float], float]:
+
+    def auxiliar(x: float) -> float:
+        return x ** y
+
+    return auxiliar
+
+
+lista: List[float] = [1, 2, 3, 4, 5, 6]
+elevar_cuadrado: Callable[[float], float] = elevar(2)
+assert aplicar_funcion(lista, elevar_cuadrado) == [1, 4, 9, 16, 25, 36]
+
+
+# Evaluación Parcial
+
+from functools import partial  # Biblioteca estandar
+
+def elevar_xy(x: float, y: float) -> float:
+    return x ** y
+
+
+lista: List[float] = [1, 2, 3, 4, 5, 6]
+elevar_cuadrado_parcial: Callable[[float], float] = partial(elevar_xy, y=2)
+assert aplicar_funcion(lista, elevar_cuadrado_parcial) == [1, 4, 9, 16, 25, 36]
+
+
+# Funciones anónimas (Lambdas)
+
+lista: List[float] = [1, 2, 3, 4, 5, 6]
+assert aplicar_funcion(lista, lambda x: x**2) == [1, 4, 9, 16, 25, 36]
+
+
+####################################################
+# 4.3 Funciones de orden superior comunes (map, filter reduce)
+####################################################
+
+from typing import Iterator     # Biblioteca estándar
+from functools import reduce    # Biblioteca estándar
+
+lista: List[float] = [1, 2, 3, 4, 5, 6]
+cuadrados: Iterator[float] = map(lambda x: x ** 2, lista)              # => [1, 4, 9, 16, 25, 36]
+cuadrados_pares: Iterator[float] = filter(lambda x: x > 5, cuadrados)  # => [9, 16, 25, 36]
+suma_pares: float = reduce(lambda x, y: x + y, cuadrados_pares)        # => 86
+
+assert suma_pares == 86
+
+####################################################
+# 4.4 Comprensiones
+####################################################
+
+lista: List[float] = [1, 2, 3, 4, 5, 6]
+cuadrados_: List[float] = [elevar_cuadrado(x) for x in lista]      # => [1, 4, 9, 16, 25, 36]
+cuadrados_pares_: List[float] = [x for x in cuadrados_ if x > 5]   # => [9, 16, 25, 36]
+suma_pares: float = sum(cuadrados_pares_)                          # => 86
+
+assert suma_pares == 86
+
+lista: List[float] = [1, 2, 3, 4, 5, 6]
+suma_pares: float = sum(elevar_cuadrado(x) for x in lista if elevar_cuadrado(x) > 5)
+
+assert suma_pares == 86
+
+
+# Código equivalente a la comprensión con bucle FOR
+
+resultado: float = 0
+
+for elemento in lista:
+    auxiliar: float = elevar_cuadrado(elemento)
+    if auxiliar > 5:
+        resultado += auxiliar
+
+assert resultado == 86
